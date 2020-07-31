@@ -1,0 +1,1 @@
+package com.aymeric.gamestore.repository;
