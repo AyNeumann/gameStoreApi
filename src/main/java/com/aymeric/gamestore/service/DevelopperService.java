@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.aymeric.gamestore.entity.Developper;
+import com.aymeric.gamestore.exception.GamestoreEntityException;
 import com.aymeric.gamestore.repository.DevelopperRepository;
 
 @Service
@@ -51,7 +52,11 @@ public class DevelopperService {
         Optional<Developper> developperOpt = devRepository.findById(id);
         
         if(!developperOpt.isPresent()) {
-            System.err.println("No developper foudn with this id");
+            StringBuilder message = new StringBuilder();
+            message.append("No Developper found with this id: ");
+            message.append(id);
+            System.err.println(message);
+            throw new GamestoreEntityException(message.toString());
         }
         
         return developperOpt.get();

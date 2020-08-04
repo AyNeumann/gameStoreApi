@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.aymeric.gamestore.entity.Developper;
 import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.entity.Game;
+import com.aymeric.gamestore.exception.GamestoreEntityException;
 import com.aymeric.gamestore.repository.GameRepository;
 
 /**
@@ -60,7 +61,11 @@ public class GameService {
         Optional<Game> gameOpt = gameRepository.findById(id);
         
         if(!gameOpt.isPresent()) {
-            System.err.println("No game found with this id");
+            StringBuilder message = new StringBuilder();
+            message.append("No Game found with this id: ");
+            message.append(id);
+            System.err.println(message);
+            throw new GamestoreEntityException(message.toString());
         }
         
         return gameOpt.get();
