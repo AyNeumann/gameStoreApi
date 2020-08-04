@@ -1,6 +1,7 @@
 package com.aymeric.gamestore.repository;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +15,8 @@ import com.aymeric.gamestore.entity.Game;
  * @author Aymeric NEUMANN
  *
  */
-public interface GameRepository extends CrudRepository<Game, Long>, PagingAndSortingRepository<Game, Long> {
-    
+public interface GameRepository extends CrudRepository<Game, UUID>, PagingAndSortingRepository<Game, UUID> {
+
     /**
      * Find all games and return it in a paged result
      * @param pageable page parameters

@@ -1,6 +1,7 @@
 package com.aymeric.gamestore.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -68,7 +69,7 @@ public class GameController {
      * @return the retrieved game or ??
      */
     @GetMapping("byId")
-    public Game getGameById(@RequestParam(name = "id") final Long id) {
+    public Game getGameById(@RequestParam(name = "id") final UUID id) {
         return gameService.getGameById(id);
     }
     
@@ -78,7 +79,7 @@ public class GameController {
      * @return true is the game exists or false otherwise
      */
     @GetMapping("existById")
-    public boolean gameExistById(@RequestParam(name = "id") final Long id) {
+    public boolean gameExistById(@RequestParam(name = "id") final UUID id) {
         return gameService.gameExistById(id);
     }
     
@@ -119,7 +120,7 @@ public class GameController {
      * @return updated game
      */
     @PutMapping("addDevelopper")
-    public Game addDevToGame(@RequestParam(name = "gameId") final Long gameId, @RequestParam(name = "devId") final Long devId) {
+    public Game addDevToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "devId") final Long devId) {
         Game updatedGame = null;
         boolean isGameExist = gameService.gameExistById(gameId);
         boolean isDevExist = devService.developperExistById(devId);
@@ -141,7 +142,7 @@ public class GameController {
      * @return updated game
      */
     @PutMapping("addEditor")
-    public Game addEditorToGame(@RequestParam(name = "gameId") final Long gameId, @RequestParam(name = "editorId") final Long editorId) {
+    public Game addEditorToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "editorId") final Long editorId) {
         Game updatedGame = null;
         boolean isGameExist = gameService.gameExistById(gameId);
         boolean isEditorExist = editorService.editorExistById(editorId);
@@ -162,7 +163,7 @@ public class GameController {
      * @return true is the game is deleted or false otherwise
      */
     @DeleteMapping("delete")
-    public boolean deleteGame(@RequestParam(name = "id") final Long id) {
+    public boolean deleteGame(@RequestParam(name = "id") final UUID id) {
         return gameService.deleteGame(id);
     }
 }

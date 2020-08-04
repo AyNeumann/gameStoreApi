@@ -3,6 +3,7 @@ package com.aymeric.gamestore.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,7 +57,7 @@ public class GameService {
      * @param id id of the game to get
      * @return the retrieved game or ??
      */
-    public Game getGameById(final Long id) {
+    public Game getGameById(final UUID id) {
         
         Optional<Game> gameOpt = gameRepository.findById(id);
         
@@ -76,7 +77,7 @@ public class GameService {
      * @param id id of the game to check
      * @return true is the game exists or false otherwise
      */
-    public boolean gameExistById(final Long id) {
+    public boolean gameExistById(final UUID id) {
         return gameRepository.existsById(id);
     }
     
@@ -113,7 +114,7 @@ public class GameService {
      * @param dev developper to add to the game
      * @return updated game
      */
-    public Game addDevToGame(final Long gameId, final Developper dev) {
+    public Game addDevToGame(final UUID gameId, final Developper dev) {
         Game gameToUpdate = getGameById(gameId);
         
         Set<Developper> devs = gameToUpdate.getDevs();
@@ -128,7 +129,7 @@ public class GameService {
      * @param editor editor to add to th game
      * @return updated game
      */
-    public Game addEditorToGame(final Long gameId, final Editor editor) {
+    public Game addEditorToGame(final UUID gameId, final Editor editor) {
         Game gameToUpdate = getGameById(gameId);
         
         Set<Editor> editors = gameToUpdate.getEditors();
@@ -142,7 +143,7 @@ public class GameService {
      * @param id id of the game to delete
      * @return true is the game is deleted or false otherwise
      */
-    public boolean deleteGame(final Long id) {
+    public boolean deleteGame(final UUID id) {
         boolean isGameDeleted = false;
         boolean isGameExists = gameRepository.existsById(id);
         
