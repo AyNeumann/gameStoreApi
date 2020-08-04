@@ -13,14 +13,12 @@ import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import lombok.Data;
 /**
  * @author Aymeric NEUMANN
  * Database entity for game
  *
  */
 @Entity
-@Data
 public class Game {
     
     /** Id of the game. */
@@ -38,10 +36,73 @@ public class Game {
     private Date releaseDate;
     
     /** Developed by*/
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
     private Set<Developper> devs;
     
     /** Edited by*/
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
     private Set<Editor> editors;
+    
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * @return the releaseDate
+     */
+    public Date getReleaseDate() {
+        return releaseDate;
+    }
+
+    /**
+     * @param releaseDate the releaseDate to set
+     */
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    /**
+     * @return the devs
+     */
+    public Set<Developper> getDevs() {
+        return devs;
+    }
+
+    /**
+     * @param devs the devs to set
+     */
+    public void setDevs(Set<Developper> devs) {
+        this.devs = devs;
+    }
+
+    /**
+     * @return the editors
+     */
+    public Set<Editor> getEditors() {
+        return editors;
+    }
+
+    /**
+     * @param editors the editors to set
+     */
+    public void setEditors(Set<Editor> editors) {
+        this.editors = editors;
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
 }

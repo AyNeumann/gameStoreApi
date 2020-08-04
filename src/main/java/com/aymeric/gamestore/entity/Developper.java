@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
  * @author Aymeric NEUMANN
@@ -21,7 +21,6 @@ import lombok.Data;
  *
  */
 @Entity
-@Data
 public class Developper {
     
     /** Id of the developper. */
@@ -35,12 +34,60 @@ public class Developper {
     private String name;
     
     /** Have developed */
-    @ManyToMany (mappedBy = "devs", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToMany (mappedBy = "devs", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JsonBackReference(value = "dev-games")
     private Set<Game> games;
     
     /** Owned by */
     @ManyToOne
     private Editor owner;
-    
-    
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the games
+     */
+    public Set<Game> getGames() {
+        return games;
+    }
+
+    /**
+     * @param games the games to set
+     */
+    public void setGames(Set<Game> games) {
+        this.games = games;
+    }
+
+    /**
+     * @return the owner
+     */
+    public Editor getOwner() {
+        return owner;
+    }
+
+    /**
+     * @param owner the owner to set
+     */
+    public void setOwner(Editor owner) {
+        this.owner = owner;
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
 }
