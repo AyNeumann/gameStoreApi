@@ -31,7 +31,7 @@ public class EditorController {
      * @param pageNumber number of the required page - 0 based count
      * @return required page
      */
-    @GetMapping("all")
+    @GetMapping("")
     public Page<Editor> getAllEditors(@RequestParam(name = "pageNumber", required = true) final Integer pageNumber){
         return editorService.getAllEditors(pageNumber);
     }

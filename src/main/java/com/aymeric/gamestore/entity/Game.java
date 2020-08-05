@@ -47,7 +47,7 @@ public class Game {
     /** Edited by*/
     @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
     private Set<Editor> editors;
-    
+        
     /**
      * @return the title
      */

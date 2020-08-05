@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aymeric.gamestore.entity.Developper;
 import com.aymeric.gamestore.entity.Editor;
+import com.aymeric.gamestore.exception.GamestoreInvalidParameterException;
 import com.aymeric.gamestore.service.DevelopperService;
 import com.aymeric.gamestore.service.EditorService;
 
@@ -43,7 +45,7 @@ public class DevelopperController {
      * @param pageNumber number of the required page - 0 based count
      * @return required page
      */
-    @GetMapping("all")
+    @GetMapping("")
     public Page<Developper> getAllDeveloppers(@RequestParam(name = "pageNumber", required = true) final Integer pageNumber){
         return devService.getAllDeveloppers(pageNumber);
     }
@@ -84,7 +86,13 @@ public class DevelopperController {
      * @return the created developper or ??
      */
     @PostMapping("create")
-    public Developper createDevelopper(@RequestBody @Valid final Developper developper) {
+    public Developper createDevelopper(@RequestBody @Valid final Developper developper, final BindingResult result) {
+        
+        if(result.hasErrors()) {
+            //FIXME: Comprendre pourquoi ConstraintViolationException est prio
+            throw new GamestoreInvalidParameterException("At least one field is empty or invalid", result);
+        }
+        
         return devService.createDevelopper(developper);
     }
     
@@ -118,7 +126,7 @@ public class DevelopperController {
             Editor editor = editorService.getEditorById(ownerId);
             devToUpdate = devService.addOwner(devId, editor);
         } else {
-            System.out.println("Error while retrieving game or editor: invalid id");
+            throw new GamestoreInvalidParameterException("At least one of the id is invalid");
         }
         
         return devToUpdate;
