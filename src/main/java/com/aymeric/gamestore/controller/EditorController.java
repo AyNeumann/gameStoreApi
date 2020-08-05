@@ -1,6 +1,7 @@
 package com.aymeric.gamestore.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -51,7 +52,7 @@ public class EditorController {
      * @return the retrieved editor or ??
      */
     @GetMapping("byId")
-    public Editor getEditorById(@RequestParam(name = "id") final Long id) {
+    public Editor getEditorById(@RequestParam(name = "id") final UUID id) {
         return editorService.getEditorById(id);
     }
     
@@ -91,7 +92,7 @@ public class EditorController {
      * @return true is the editor is deleted or false otherwise
      */
     @DeleteMapping("delete")
-    public boolean deleteEditor(@RequestParam(name = "id") final Long id) {
+    public boolean deleteEditor(@RequestParam(name = "id") final UUID id) {
         return editorService.deleteEditor(id);
     }
 }

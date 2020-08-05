@@ -1,6 +1,7 @@
 package com.aymeric.gamestore.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aymeric.gamestore.entity.Developper;
+import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.service.DevelopperService;
+import com.aymeric.gamestore.service.EditorService;
 
 /**
  * Manage request about Developper
@@ -31,6 +34,9 @@ public class DevelopperController {
     
     @Autowired
     private DevelopperService devService;
+    
+    @Autowired
+    private EditorService editorService;
     
     /**
      * Get all developpers by page
@@ -58,7 +64,7 @@ public class DevelopperController {
      * @return the retrieved developper or ??
      */
     @GetMapping("byId")
-    public Developper getDeveloppersById(@RequestParam(name="id") final Long id) {
+    public Developper getDeveloppersById(@RequestParam(name="id") final UUID id) {
         return devService.getDeveloppersById(id);
     }
     
@@ -68,7 +74,7 @@ public class DevelopperController {
      * @return true is the developper exists or false otherwise
      */
     @GetMapping("existById")
-    public boolean developperExistById(@RequestParam(name="id") final Long id) {
+    public boolean developperExistById(@RequestParam(name="id") final UUID id) {
         return devService.developperExistById(id);
     }
     
@@ -77,7 +83,7 @@ public class DevelopperController {
      * @param developper a valid developper
      * @return the created developper or ??
      */
-    @PostMapping("/create")
+    @PostMapping("create")
     public Developper createDevelopper(@RequestBody @Valid final Developper developper) {
         return devService.createDevelopper(developper);
     }
@@ -102,13 +108,29 @@ public class DevelopperController {
         return null;
     }
     
+    @PutMapping("addOwner")
+    public Developper addOwner(@RequestParam(name = "devId") final UUID devId, @RequestParam(name = "ownerId") final UUID ownerId) {
+        Developper devToUpdate = null;
+        boolean isDevExist = devService.developperExistById(devId);
+        boolean isOwnerExist = editorService.editorExistById(ownerId);
+        
+        if(isDevExist && isOwnerExist) {
+            Editor editor = editorService.getEditorById(ownerId);
+            devToUpdate = devService.addOwner(devId, editor);
+        } else {
+            System.out.println("Error while retrieving game or editor: invalid id");
+        }
+        
+        return devToUpdate;
+    }
+    
     /**
      * Delete the developper
      * @param id id of the developper to delete
      * @return the deleted developper
      */
     @DeleteMapping("delete")
-    public boolean deleteDevelopper(@RequestParam(name = "id") final Long id) {
+    public boolean deleteDevelopper(@RequestParam(name = "id") final UUID id) {
         return devService.deleteDevelopper(id);
     }
     

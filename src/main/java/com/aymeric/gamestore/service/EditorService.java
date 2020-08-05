@@ -2,6 +2,7 @@ package com.aymeric.gamestore.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,7 +44,7 @@ public class EditorService {
         return editorRepository.findAllByName(name);
     }
     
-    public boolean editorExistById(final long id) {
+    public boolean editorExistById(final UUID id) {
         return editorRepository.existsById(id);
     }
     
@@ -52,7 +53,7 @@ public class EditorService {
      * @param id id of the editor to get
      * @return the retrieved editor or ??
      */
-    public Editor getEditorById(final Long id) {
+    public Editor getEditorById(final UUID id) {
         Optional<Editor> editorOpt =  editorRepository.findById(id);
         
         if(!editorOpt.isPresent()) {
@@ -98,7 +99,7 @@ public class EditorService {
      * @param id id of the editor to delete
      * @return true is the editor is deleted or false otherwise
      */
-    public boolean deleteEditor(final Long id) {
+    public boolean deleteEditor(final UUID id) {
         boolean isEditorDeleted = false;
         boolean isEditorExists = editorRepository.existsById(id);
         

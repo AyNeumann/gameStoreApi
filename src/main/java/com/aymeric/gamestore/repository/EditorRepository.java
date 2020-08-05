@@ -1,6 +1,7 @@
 package com.aymeric.gamestore.repository;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ import com.aymeric.gamestore.entity.Editor;
  * @author Aymeric NEUMANN
  *
  */
-public interface EditorRepository extends CrudRepository<Editor, Long>, PagingAndSortingRepository<Editor, Long> {
+public interface EditorRepository extends CrudRepository<Editor, UUID>, PagingAndSortingRepository<Editor, UUID> {
     
     /**
      * Find all editors and return it in a paged result

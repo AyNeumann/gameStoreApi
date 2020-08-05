@@ -120,7 +120,7 @@ public class GameController {
      * @return updated game
      */
     @PutMapping("addDevelopper")
-    public Game addDevToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "devId") final Long devId) {
+    public Game addDevToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "devId") final UUID devId) {
         Game updatedGame = null;
         boolean isGameExist = gameService.gameExistById(gameId);
         boolean isDevExist = devService.developperExistById(devId);
@@ -142,7 +142,7 @@ public class GameController {
      * @return updated game
      */
     @PutMapping("addEditor")
-    public Game addEditorToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "editorId") final Long editorId) {
+    public Game addEditorToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "editorId") final UUID editorId) {
         Game updatedGame = null;
         boolean isGameExist = gameService.gameExistById(gameId);
         boolean isEditorExist = editorService.editorExistById(editorId);

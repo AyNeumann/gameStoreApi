@@ -1,6 +1,7 @@
 package com.aymeric.gamestore.repository;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ import com.aymeric.gamestore.entity.Developper;
  * @author Aymeric NEUMANN
  *
  */
-public interface DevelopperRepository extends CrudRepository<Developper, Long>, PagingAndSortingRepository<Developper, Long>  {
+public interface DevelopperRepository extends CrudRepository<Developper, UUID>, PagingAndSortingRepository<Developper, UUID>  {
     
     /**
      * Find all developpers and return it in a paged result

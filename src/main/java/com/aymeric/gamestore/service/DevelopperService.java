@@ -2,6 +2,7 @@ package com.aymeric.gamestore.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.aymeric.gamestore.entity.Developper;
+import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.exception.GamestoreEntityException;
 import com.aymeric.gamestore.repository.DevelopperRepository;
 
@@ -48,7 +50,7 @@ public class DevelopperService {
      * @param id id of the developper to get
      * @return the retrieved developper or ??
      */
-    public Developper getDeveloppersById(final long id) {
+    public Developper getDeveloppersById(final UUID id) {
         Optional<Developper> developperOpt = devRepository.findById(id);
         
         if(!developperOpt.isPresent()) {
@@ -62,7 +64,7 @@ public class DevelopperService {
         return developperOpt.get();
     }
     
-    public boolean developperExistById(final long id) {
+    public boolean developperExistById(final UUID id) {
         return devRepository.existsById(id);
     }
     
@@ -93,12 +95,22 @@ public class DevelopperService {
         return null;
     }
     
+    public Developper addOwner(final UUID devId, final Editor owner) {
+        Developper devToUpdate = getDeveloppersById(devId);
+        
+        devToUpdate.setOwner(owner);
+        
+        devRepository.save(devToUpdate);
+        
+        return devToUpdate;
+    }
+    
     /**
      * Delete the developper
      * @param id id of the developper to delete
      * @return the deleted developper
      */
-    public boolean deleteDevelopper(final Long id) {
+    public boolean deleteDevelopper(final UUID id) {
         boolean isDevDeleted = false;
         boolean isDevExists = devRepository.existsById(id);
         
