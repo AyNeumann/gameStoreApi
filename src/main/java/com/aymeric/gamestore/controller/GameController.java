@@ -89,7 +89,7 @@ public class GameController {
      * Save the game in the database
      * @param game a valid game
      * @param result spring framework validation interface
-     * @return the created game or ??
+     * @return the created game or a GamestoreInvalidParameterException
      */
     @PostMapping("create")
     public Game createGame(@RequestBody @Valid Game game, final BindingResult result) {
