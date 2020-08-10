@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.BindingResult;
@@ -36,12 +38,18 @@ import com.aymeric.gamestore.service.GameService;
 @RequestMapping("/games")
 public class GameController {
     
+    /** Logback logger reference. */
+    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
+    
+    /** Game service reference. */
     @Autowired
     private GameService gameService;
     
+    /** Developper service reference. */
     @Autowired
     private DevelopperService devService;
     
+    /** Editor service reference. */
     @Autowired
     private EditorService editorService;
     
@@ -52,6 +60,7 @@ public class GameController {
      */
     @GetMapping("")
     public Page<Game> getAllGames(@RequestParam(name = "pageNumber", required = true) final Integer pageNumber) {
+        logger.error("Getting all games...");
         return gameService.getAllGames(pageNumber);
     }
     
@@ -95,12 +104,24 @@ public class GameController {
     public Game createGame(@RequestBody @Valid Game game, final BindingResult result) {
         
         if(result.hasErrors()) {
-            //FIXME: Comprendre pourquoi ConstraintViolationException est prio
             throw new GamestoreInvalidParameterException("At least one field is empty or invalid", result);
         }
         
         return gameService.createGame(game);
     }
+    
+    /* TEST */
+    public static class CustomTypeFor2031 { 
+        private String property;
+
+        public String getProperty() {
+          return property;
+        }
+
+        public void setProperty(String property) {
+          this.property = property;
+        }
+      }
     
     /**
      * Save the list of valid games
