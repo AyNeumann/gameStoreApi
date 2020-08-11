@@ -24,5 +24,17 @@ public interface EditorRepository extends CrudRepository<Editor, UUID>, PagingAn
      */
     Page<Editor> findAll(Pageable pageable);
     
+    /**
+     * Find all editors with a strictly matching name
+     * @param name name to find
+     * @return a list of Editor with matching name
+     */
     List<Editor> findAllByName(final String name);
+    
+    /**
+     * Find all editors with a name containing the string passed as parameter
+     * @param name name to find
+     * @return a list of Editor with matching name
+     */
+    List<Editor> findByNameContainingOrderByNameAsc(final String name);
 }

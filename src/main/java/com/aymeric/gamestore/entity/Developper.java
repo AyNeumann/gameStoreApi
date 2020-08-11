@@ -10,8 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -34,8 +32,6 @@ public class Developper {
     private UUID id;
     
     /** Name of the company */
-    @NotNull
-    @NotBlank
     private String name;
     
     /** Have developed */

@@ -30,4 +30,6 @@ public interface DevelopperRepository extends CrudRepository<Developper, UUID>, 
      * @return list of developpers
      */
     List<Developper> findByName(String name);
+    
+    List<Developper> findByNameContainingOrderByNameAsc(String name);
 }

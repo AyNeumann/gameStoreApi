@@ -29,5 +29,7 @@ public interface GameRepository extends CrudRepository<Game, UUID>, PagingAndSor
      * @param Title title of the game to find
      * @return list of games
      */
-    List<Game> findByTitle(String Title);
+    List<Game> findByTitle(String title);
+    
+    List<Game> findByTitleContainingOrderByTitleAsc(String title);
 }

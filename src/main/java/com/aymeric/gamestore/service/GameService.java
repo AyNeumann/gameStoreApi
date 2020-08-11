@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,9 @@ import com.aymeric.gamestore.repository.GameRepository;
 @Service
 public class GameService {
     
+    /** Logback logger reference. */
+    private static final Logger logger = LoggerFactory.getLogger(GameService.class);
+    
     /** Number of user return per page. */
     private static final int NUM_OF_USER_PER_PAGE = 50;
     
@@ -40,7 +45,13 @@ public class GameService {
     public Page<Game> getAllGames(final Integer pageNumber){
         Pageable pageable = PageRequest.of(pageNumber, NUM_OF_USER_PER_PAGE, Sort.by("title"));
         
-        return gameRepository.findAll(pageable);
+        Page<Game> games = gameRepository.findAll(pageable);
+        
+        if(games.isEmpty()) {
+            logger.warn("No games found on the page number {}", pageNumber);
+        }
+        
+        return games;
     }
     
     /**
@@ -48,8 +59,22 @@ public class GameService {
      * @param title title of the game(s) to find
      * @return a list of matching games or an empty list
      */
-    public List<Game> getGamesByTile(String title) {
-        return gameRepository.findByTitle(title);
+    public List<Game> getGamesByTile(String title, String searchMode) {
+        List<Game> games = null;
+        
+        if(searchMode != null && searchMode.equals("strict")) {
+            logger.debug("Getting games by title with strict search");
+            games = gameRepository.findByTitle(title);
+        } else {
+            logger.debug("Getting games by title without strict search");
+            games = gameRepository.findByTitleContainingOrderByTitleAsc(title);
+        }
+        
+        if(games.isEmpty()) {
+            logger.info("No games found with the title {}", title);
+        }
+        
+        return games;
     }
     
     /**
@@ -62,11 +87,9 @@ public class GameService {
         Optional<Game> gameOpt = gameRepository.findById(id);
         
         if(!gameOpt.isPresent()) {
-            StringBuilder message = new StringBuilder();
-            message.append("No Game found with this id: ");
-            message.append(id);
-            System.err.println(message);
-            throw new GamestoreEntityException(message.toString());
+            String message = String.format("Cannot found a game with this id: %s", id);
+            logger.info(message);
+            throw new GamestoreEntityException(message);
         }
         
         return gameOpt.get();
@@ -78,7 +101,13 @@ public class GameService {
      * @return true is the game exists or false otherwise
      */
     public boolean gameExistById(final UUID id) {
-        return gameRepository.existsById(id);
+        boolean isGameExist = gameRepository.existsById(id);
+        
+        if(!isGameExist) {
+            logger.info("Cannot found a game with the id:{}", id);
+        }
+        
+        return isGameExist;
     }
     
     /**
@@ -87,16 +116,42 @@ public class GameService {
      * @return the created game or ??
      */
     public Game createGame(final Game gameToCreate) {
-        return gameRepository.save(gameToCreate);
+        Game createdGame = gameRepository.save(gameToCreate);
+        
+        if(createdGame.getId() == null) {
+            String message = String.format("The following game has not been created: %s", gameToCreate);
+            logger.error(message);
+            throw new GamestoreEntityException(message);
+        }
+        
+        return createdGame;
     }
     
     /**
-     * Save the list of valid games
+     * Save the list of valid games - TO TEST WITH ERRORS
      * @param games all games to create
      * @return the created games or ??
      */
     public List<Game> createGames(List<Game> gamesToCreate) {
-        return (List<Game>) gameRepository.saveAll(gamesToCreate);
+        StringBuilder errorMsg = new StringBuilder();
+        boolean isAGameOnError = false;
+        List<Game> games = (List<Game>) gameRepository.saveAll(gamesToCreate);
+        
+        
+        for (Game game : games) {
+            if(game.getId() == null) {
+                String message = String.format("The game titled: %s has not been created", game.getTitle());
+                errorMsg.append(message);
+                logger.warn(message);
+                isAGameOnError = true;
+            }
+        }
+        
+        if(isAGameOnError) {
+            throw new GamestoreEntityException(errorMsg.toString());
+        }
+        
+        return games;
     }
     
     /**
@@ -117,6 +172,7 @@ public class GameService {
     public Game addDevToGame(final UUID gameId, final Developper dev) {
         Game gameToUpdate = getGameById(gameId);
         
+        logger.debug("Adding the developper {} to the game {}", dev.getName(), gameToUpdate.getTitle());
         Set<Developper> devs = gameToUpdate.getDevs();
         devs.add(dev);
         
@@ -126,12 +182,13 @@ public class GameService {
     /**
      * Add an editor to a game
      * @param gameId id of the game to update
-     * @param editor editor to add to th game
+     * @param editor editor to add to the game
      * @return updated game
      */
     public Game addEditorToGame(final UUID gameId, final Editor editor) {
         Game gameToUpdate = getGameById(gameId);
         
+        logger.debug("Adding the editor {} to the game {}", editor.getName(), gameToUpdate.getTitle());
         Set<Editor> editors = gameToUpdate.getEditors();
         editors.add(editor);
         
@@ -148,8 +205,11 @@ public class GameService {
         boolean isGameExists = gameRepository.existsById(id);
         
         if(isGameExists) {
+            logger.debug("Deleting game with the id: {}", id);
             gameRepository.deleteById(id);
             isGameDeleted = true;
+        } else {
+            logger.info("No game found with the id: {}", id);
         }
         
         return isGameDeleted;

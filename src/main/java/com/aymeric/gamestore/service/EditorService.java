@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,9 @@ import com.aymeric.gamestore.repository.EditorRepository;
 
 @Service
 public class EditorService {
+    
+    /** Logback logger reference. */
+    private static final Logger logger = LoggerFactory.getLogger(EditorService.class);
     
     /** Number of user return per page. */
     private static final int NUM_OF_USER_PER_PAGE = 50;
@@ -40,8 +45,18 @@ public class EditorService {
      * @param name name of the editor(s) to find
      * @return a list of matching editors or an empty list
      */
-    public List<Editor> getEditorsByName(final String name) {
-        return editorRepository.findAllByName(name);
+    public List<Editor> getEditorsByName(final String name, final String searchMode) {
+        List<Editor> editors = null;
+        
+        if(searchMode != null && searchMode.equals("strict")) {
+            logger.debug("Getting editors by title with strict search");
+            editors = editorRepository.findAllByName(name);
+        } else {
+            logger.debug("Getting editors by title without strict search");
+            editors = editorRepository.findByNameContainingOrderByNameAsc(name);
+        }
+        
+        return editors;
     }
     
     public boolean editorExistById(final UUID id) {

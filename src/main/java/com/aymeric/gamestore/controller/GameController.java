@@ -1,10 +1,13 @@
 package com.aymeric.gamestore.controller;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aymeric.gamestore.dto.GameDTO;
 import com.aymeric.gamestore.entity.Developper;
 import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.entity.Game;
@@ -27,6 +31,8 @@ import com.aymeric.gamestore.exception.GamestoreInvalidParameterException;
 import com.aymeric.gamestore.service.DevelopperService;
 import com.aymeric.gamestore.service.EditorService;
 import com.aymeric.gamestore.service.GameService;
+
+import io.swagger.annotations.ApiOperation;
 
 /**
  * Manage request about games
@@ -53,15 +59,21 @@ public class GameController {
     @Autowired
     private EditorService editorService;
     
+    @Autowired
+    private ModelMapper modelMapper;
+        
     /**
      * Get all games by page
      * @param pageNumber number of the required page - 0 based count
      * @return required page
      */
     @GetMapping("")
-    public Page<Game> getAllGames(@RequestParam(name = "pageNumber", required = true) final Integer pageNumber) {
-        logger.error("Getting all games...");
-        return gameService.getAllGames(pageNumber);
+    @ApiOperation(value = "Get all games", notes = "Getting all games - paged result", response = Game[].class)
+    public Page<GameDTO> getAllGames(@RequestParam(name = "pageNumber", required = true) final Integer pageNumber) {
+        
+        logger.debug("Getting all games at page: {}", pageNumber);
+        
+        return convertToDTOPage(gameService.getAllGames(pageNumber));
     }
     
     /**
@@ -70,67 +82,73 @@ public class GameController {
      * @return a list of matching games or an empty list
      */
     @GetMapping("byTitle")
-    public List<Game> getGamesByTitle(@RequestParam(name = "title") final String title) {
-        return gameService.getGamesByTile(title);
+    @ApiOperation(value = "Get games by title", notes = "Getting all games with matching title", response = Game[].class)
+    public List<GameDTO> getGamesByTitle(
+            @RequestParam(name = "title") final String title,
+            @RequestParam(name = "searchMode", required = false) final String searchMode
+            ) {
+        logger.debug("Getting all games titled: {}", title);
+        return convertToDTOList(gameService.getGamesByTile(title, searchMode));
     }
     
     /**
-     * Get the game with the matching id
+     * Get the game with the matching id - Test OK
      * @param id id of the game to get
      * @return the retrieved game or ??
      */
     @GetMapping("byId")
-    public Game getGameById(@RequestParam(name = "id") final UUID id) {
-        return gameService.getGameById(id);
+    @ApiOperation(value = "Get game by Id", notes = "Getting the game wtih the matching id", response = Game.class)
+    public GameDTO getGameById(@RequestParam(name = "id") final UUID id) {
+        logger.debug("Getting game with the id: {}", id);
+        return convertToDto(gameService.getGameById(id));
     }
     
     /**
-     * Check if a game exists with this id
+     * Check if a game exists with this id - Test OK
      * @param id id of the game to check
      * @return true is the game exists or false otherwise
      */
     @GetMapping("existById")
+    @ApiOperation(value = "Check if a game exists by id", notes = "Checking if a game exists with this id", response = Boolean.class)
     public boolean gameExistById(@RequestParam(name = "id") final UUID id) {
+        logger.debug("Check if game with id: {} exists", id);
         return gameService.gameExistById(id);
     }
     
     /**
-     * Save the game in the database
+     * Save the game in the database - Test OK
      * @param game a valid game
      * @param result spring framework validation interface
      * @return the created game or a GamestoreInvalidParameterException
      */
     @PostMapping("create")
-    public Game createGame(@RequestBody @Valid Game game, final BindingResult result) {
+    @ApiOperation(value = "Create a new game", notes = "Creating a new game", response = Game.class)
+    public GameDTO createGame(@RequestBody @Valid GameDTO gameDto, final BindingResult result) {
         
         if(result.hasErrors()) {
+            logger.info("At least one field is empty or invalid: {}", result);
             throw new GamestoreInvalidParameterException("At least one field is empty or invalid", result);
         }
+        logger.debug("Creating the game titled {}", gameDto.getTitle());
         
-        return gameService.createGame(game);
+        Game game = convertToEntity(gameDto);
+        
+        return convertToDto(gameService.createGame(game));
     }
-    
-    /* TEST */
-    public static class CustomTypeFor2031 { 
-        private String property;
-
-        public String getProperty() {
-          return property;
-        }
-
-        public void setProperty(String property) {
-          this.property = property;
-        }
-      }
-    
+        
     /**
-     * Save the list of valid games
+     * Save the list of valid games - Test OK
      * @param games all games to create
      * @return the created games or ??
      */
     @PostMapping("createAll")
-    public List<Game> createGames(@RequestBody @Valid final List<Game> games) {
-        return gameService.createGames(games);
+    @ApiOperation(value = "Create multiple games", notes = "Creating a list of games", response = Game[].class)
+    public List<GameDTO> createGames(@RequestBody @Valid final List<GameDTO> games) {
+        logger.debug("Creating the following games {}", games);
+        
+        List<Game> gamesEntities = convertToEntityList(games);
+        
+        return convertToDTOList(gameService.createGames(gamesEntities));
     }
     
     /**
@@ -139,7 +157,8 @@ public class GameController {
      * @return the updated game
      */
     @PutMapping("update")
-    public Game updateGame(@RequestBody @Valid Game game) {
+    @ApiOperation(value = "Update game", notes = "Updating a game", response = Game.class)
+    public GameDTO updateGame(@RequestBody @Valid GameDTO game) {
         return null;
     }
     
@@ -150,19 +169,34 @@ public class GameController {
      * @return updated game
      */
     @PutMapping("addDevelopper")
-    public Game addDevToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "devId") final UUID devId) {
+    @ApiOperation(value = "Add a developper to a game", notes = "Adding a developper to a game", response = Game.class)
+    public GameDTO addDevToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "devId") final UUID devId) {
         Game updatedGame = null;
+        StringBuilder errorMsg = new StringBuilder();
         boolean isGameExist = gameService.gameExistById(gameId);
         boolean isDevExist = devService.developperExistById(devId);
                 
         if(isGameExist && isDevExist) {
             Developper dev = devService.getDeveloppersById(devId);
             updatedGame = gameService.addDevToGame(gameId, dev);
-        } else {
-            throw new GamestoreInvalidParameterException("At least one of the id is invalid");
+        } 
+        
+        if(!isGameExist) {
+            String message = String.format("Cannot found a game with this id: %s", gameId);
+            errorMsg.append(message);
+            logger.info(message);
+        }
+        if(!isDevExist) {
+            String message = String.format("Cannot found a developper with this id: %s", devId);
+            errorMsg.append(message);
+            logger.info(message);
         }
         
-        return updatedGame;
+        if(!isGameExist || !isDevExist) {
+            throw new GamestoreInvalidParameterException(errorMsg.toString());
+        }
+        
+        return convertToDto(updatedGame);
     }
     
     /**
@@ -172,19 +206,37 @@ public class GameController {
      * @return updated game
      */
     @PutMapping("addEditor")
-    public Game addEditorToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "editorId") final UUID editorId) {
+    @ApiOperation(value = "Add an editor to a game", notes = "Adding an editor to a game", response = Game.class)
+    public GameDTO addEditorToGame(
+            @RequestParam(name = "gameId") final UUID gameId, 
+            @RequestParam(name = "editorId") final UUID editorId
+            ) {
         Game updatedGame = null;
+        StringBuilder errorMsg = new StringBuilder();
         boolean isGameExist = gameService.gameExistById(gameId);
         boolean isEditorExist = editorService.editorExistById(editorId);
                         
         if(isGameExist && isEditorExist) {
             Editor editor = editorService.getEditorById(editorId);
             updatedGame = gameService.addEditorToGame(gameId, editor);
-        } else {
-            throw new GamestoreInvalidParameterException("At least one of the id is invalid");
         }
         
-        return updatedGame;
+        if(!isGameExist) {
+            String message = String.format("Cannot found a game with this id: %s", gameId);
+            errorMsg.append(message);
+            logger.info(message);
+        }
+        if(!isEditorExist) {
+            String message = String.format("Cannot found a editor with this id: %s", editorId);
+            errorMsg.append(message);
+            logger.info(message);
+        }
+        
+        if(!isGameExist || !isEditorExist) {
+            throw new GamestoreInvalidParameterException(errorMsg.toString());
+        }
+        
+        return convertToDto(updatedGame);
     }
     
     /**
@@ -193,7 +245,62 @@ public class GameController {
      * @return true is the game is deleted or false otherwise
      */
     @DeleteMapping("delete")
+    @ApiOperation(value = "Delete a game", notes = "Deleting the game with the matching id", response = Boolean.class)
     public boolean deleteGame(@RequestParam(name = "id") final UUID id) {
         return gameService.deleteGame(id);
+    }
+    
+    
+    
+    
+    /**
+     * Convert Game Entity to GameDTO class
+     * @param game Game Entity to convert
+     * @return a GameDTO
+     */
+    private GameDTO convertToDto(Game game) {
+        return modelMapper.map(game, GameDTO.class);
+    }
+    
+    /**
+     * Convert GameDTO class to a Game Entity
+     * @param gameDTO GameDTO to convert
+     * @return a Game Entity
+     */
+    private Game convertToEntity(GameDTO gameDTO) {
+        return modelMapper.map(gameDTO, Game.class);
+    }
+    
+    /**
+     * Convert Game Entities page to GameDTO page
+     * @param games page of Game Entities to convert
+     * @return a Page of GameDTO
+     */
+    private Page<GameDTO> convertToDTOPage(Page<Game> games) {
+        Type pageType = new TypeToken<Page<GameDTO>>() {}.getType();
+        
+        return new ModelMapper().map(games, pageType);
+    }
+    
+    /**
+     * Convert a list of Game Entities to a list of GameDTO
+     * @param games list of Game Entities to convert
+     * @return a List of GameDTO
+     */
+    private List<GameDTO> convertToDTOList(List<Game> games) {
+        Type pageType = new TypeToken<List<GameDTO>>() {}.getType();
+        
+        return new ModelMapper().map(games, pageType);
+    }
+    
+    /**
+     * Convert a list of GameDTO to a list of Game Entities
+     * @param games list of GameDTO to convert
+     * @return a List of GameEntities
+     */
+    private List<Game> convertToEntityList(List<GameDTO> games) {
+        Type pageType = new TypeToken<List<Game>>() {}.getType();
+        
+        return new ModelMapper().map(games, pageType);
     }
 }
