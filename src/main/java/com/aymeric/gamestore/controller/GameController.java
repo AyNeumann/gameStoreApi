@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aymeric.gamestore.dto.GameDTO;
+import com.aymeric.gamestore.dto.GameDevEditorRelationshipDTO;
 import com.aymeric.gamestore.entity.Developper;
 import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.entity.Game;
@@ -97,7 +98,7 @@ public class GameController {
      * @return the retrieved game or ??
      */
     @GetMapping("byId")
-    @ApiOperation(value = "Get game by Id", notes = "Getting the game wtih the matching id", response = Game.class)
+    @ApiOperation(value = "Get game by Id", notes = "Getting the game with the matching id", response = Game.class)
     public GameDTO getGameById(@RequestParam(name = "id") final UUID id) {
         logger.debug("Getting game with the id: {}", id);
         return convertToDto(gameService.getGameById(id));
@@ -165,29 +166,34 @@ public class GameController {
     /**
      * Add a developper for a game
      * @param gameId id of the game to add the developper to
-     * @param devId id of the developper to add
+     * @param infos GameDevEditorRelationshipDTO containing id of the game and of the developper
      * @return updated game
      */
     @PutMapping("addDevelopper")
     @ApiOperation(value = "Add a developper to a game", notes = "Adding a developper to a game", response = Game.class)
-    public GameDTO addDevToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestParam(name = "devId") final UUID devId) {
+    public GameDTO addDevToGame(@RequestParam(name = "gameId") final UUID gameId, @RequestBody @Valid GameDevEditorRelationshipDTO infos) {
+        if(!gameId.equals(infos.getGameId())) {
+            throw new GamestoreInvalidParameterException("URL parameter doesn't not match with the request body");
+        }
+        checkIdEquality(gameId, infos);
+        
         Game updatedGame = null;
         StringBuilder errorMsg = new StringBuilder();
-        boolean isGameExist = gameService.gameExistById(gameId);
-        boolean isDevExist = devService.developperExistById(devId);
+        boolean isGameExist = gameService.gameExistById(infos.getGameId());
+        boolean isDevExist = devService.developperExistById(infos.getDevId());
                 
         if(isGameExist && isDevExist) {
-            Developper dev = devService.getDeveloppersById(devId);
-            updatedGame = gameService.addDevToGame(gameId, dev);
+            Developper dev = devService.getDeveloppersById(infos.getDevId());
+            updatedGame = gameService.addDevToGame(infos.getGameId(), dev);
         } 
         
         if(!isGameExist) {
-            String message = String.format("Cannot found a game with this id: %s", gameId);
+            String message = String.format("Cannot found a game with this id: %s", infos.getGameId());
             errorMsg.append(message);
             logger.info(message);
         }
         if(!isDevExist) {
-            String message = String.format("Cannot found a developper with this id: %s", devId);
+            String message = String.format("Cannot found a developper with this id: %s", infos.getDevId());
             errorMsg.append(message);
             logger.info(message);
         }
@@ -209,25 +215,27 @@ public class GameController {
     @ApiOperation(value = "Add an editor to a game", notes = "Adding an editor to a game", response = Game.class)
     public GameDTO addEditorToGame(
             @RequestParam(name = "gameId") final UUID gameId, 
-            @RequestParam(name = "editorId") final UUID editorId
+            @RequestBody @Valid GameDevEditorRelationshipDTO infos
             ) {
+        checkIdEquality(gameId, infos);
+        
         Game updatedGame = null;
         StringBuilder errorMsg = new StringBuilder();
-        boolean isGameExist = gameService.gameExistById(gameId);
-        boolean isEditorExist = editorService.editorExistById(editorId);
+        boolean isGameExist = gameService.gameExistById(infos.getGameId());
+        boolean isEditorExist = editorService.editorExistById(infos.getEditorId());
                         
         if(isGameExist && isEditorExist) {
-            Editor editor = editorService.getEditorById(editorId);
-            updatedGame = gameService.addEditorToGame(gameId, editor);
+            Editor editor = editorService.getEditorById(infos.getEditorId());
+            updatedGame = gameService.addEditorToGame(infos.getGameId(), editor);
         }
         
         if(!isGameExist) {
-            String message = String.format("Cannot found a game with this id: %s", gameId);
+            String message = String.format("Cannot found a game with this id: %s", infos.getGameId());
             errorMsg.append(message);
             logger.info(message);
         }
         if(!isEditorExist) {
-            String message = String.format("Cannot found a editor with this id: %s", editorId);
+            String message = String.format("Cannot found a editor with this id: %s", infos.getEditorId());
             errorMsg.append(message);
             logger.info(message);
         }
@@ -249,16 +257,24 @@ public class GameController {
     public boolean deleteGame(@RequestParam(name = "id") final UUID id) {
         return gameService.deleteGame(id);
     }
-    
-    
-    
+        
+    /**
+     * Check if the game id passed in the URL parameters and in the request body are equals
+     * @param gameId id of the game passed in the URL parameters
+     * @param infos GameDevEditorRelationshipDTO containing the id of the game to update
+     */
+    private void checkIdEquality(final UUID gameId, final GameDevEditorRelationshipDTO infos) {
+        if(!gameId.equals(infos.getGameId())) {
+            throw new GamestoreInvalidParameterException("URL parameter doesn't not match with the request body");
+        }
+    }
     
     /**
      * Convert Game Entity to GameDTO class
      * @param game Game Entity to convert
      * @return a GameDTO
      */
-    private GameDTO convertToDto(Game game) {
+    private GameDTO convertToDto(final Game game) {
         return modelMapper.map(game, GameDTO.class);
     }
     
@@ -267,7 +283,7 @@ public class GameController {
      * @param gameDTO GameDTO to convert
      * @return a Game Entity
      */
-    private Game convertToEntity(GameDTO gameDTO) {
+    private Game convertToEntity(final GameDTO gameDTO) {
         return modelMapper.map(gameDTO, Game.class);
     }
     
@@ -276,7 +292,7 @@ public class GameController {
      * @param games page of Game Entities to convert
      * @return a Page of GameDTO
      */
-    private Page<GameDTO> convertToDTOPage(Page<Game> games) {
+    private Page<GameDTO> convertToDTOPage(final Page<Game> games) {
         Type pageType = new TypeToken<Page<GameDTO>>() {}.getType();
         
         return new ModelMapper().map(games, pageType);
@@ -287,7 +303,7 @@ public class GameController {
      * @param games list of Game Entities to convert
      * @return a List of GameDTO
      */
-    private List<GameDTO> convertToDTOList(List<Game> games) {
+    private List<GameDTO> convertToDTOList(final List<Game> games) {
         Type pageType = new TypeToken<List<GameDTO>>() {}.getType();
         
         return new ModelMapper().map(games, pageType);
@@ -298,7 +314,7 @@ public class GameController {
      * @param games list of GameDTO to convert
      * @return a List of GameEntities
      */
-    private List<Game> convertToEntityList(List<GameDTO> games) {
+    private List<Game> convertToEntityList(final List<GameDTO> games) {
         Type pageType = new TypeToken<List<Game>>() {}.getType();
         
         return new ModelMapper().map(games, pageType);

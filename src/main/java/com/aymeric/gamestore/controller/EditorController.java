@@ -80,7 +80,7 @@ public class EditorController {
     }
     
     /**
-     * Save the list of valid editors
+     * Save the list of valid editors - Test OK
      * @param editors all editors to create
      * @return the created editors or ??
      */
@@ -104,7 +104,7 @@ public class EditorController {
         
         return convertToDto(editorService.updateEditor(updatedEditor));
     }
-    
+        
     /**
      * Delete the editor
      * @param id id of the editor to delete

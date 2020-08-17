@@ -8,6 +8,11 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+/**
+ * Editor Data Transfert Object
+ * @author Aymeric NEUMANN
+ *
+ */
 public class EditorDTO {
     
     private UUID id;

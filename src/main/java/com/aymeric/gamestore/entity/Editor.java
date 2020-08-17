@@ -1,5 +1,6 @@
 package com.aymeric.gamestore.entity;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,8 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.springframework.cache.annotation.Cacheable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -21,7 +25,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
  * Game edition company
  */
 @Entity
-public class Editor {
+@Cacheable
+public class Editor implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4262306156462288554L;
+
 
     /** Id of the editor */
     @Id
@@ -35,14 +46,16 @@ public class Editor {
     private String name;
     
     /** Have edited */
-    @ManyToMany (mappedBy = "editors", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany (mappedBy = "editor", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JsonBackReference(value = "editor-games")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<Game> games;
     
     /** Owner of */
     @OneToMany(mappedBy="owner")
     @JsonBackReference(value = "editor-dev")
-    private Set<Developper> studios;
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<Developper> developper;
 
     /**
      * @return the name
@@ -76,14 +89,14 @@ public class Editor {
      * @return the studios
      */
     public Set<Developper> getStudios() {
-        return studios;
+        return developper;
     }
 
     /**
      * @param studios the studios to set
      */
     public void setStudios(Set<Developper> studios) {
-        this.studios = studios;
+        this.developper = studios;
     }
 
     /**

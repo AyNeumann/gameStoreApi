@@ -1,5 +1,6 @@
 package com.aymeric.gamestore.entity;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,8 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.springframework.cache.annotation.Cacheable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -22,8 +26,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
  *
  */
 @Entity
-public class Developper {
+@Cacheable
+public class Developper implements Serializable {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7596387642430312739L;
+
     /** Id of the developper. */
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -35,8 +45,9 @@ public class Developper {
     private String name;
     
     /** Have developed */
-    @ManyToMany (mappedBy = "devs", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany (mappedBy = "developper", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JsonBackReference(value = "dev-games")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<Game> games;
     
     /** Owned by */

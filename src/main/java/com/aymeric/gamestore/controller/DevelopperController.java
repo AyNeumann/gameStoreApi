@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aymeric.gamestore.dto.DevelopperDTO;
+import com.aymeric.gamestore.dto.GameDevEditorRelationshipDTO;
 import com.aymeric.gamestore.entity.Developper;
 import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.exception.GamestoreInvalidParameterException;
@@ -143,17 +144,37 @@ public class DevelopperController {
         return null;
     }
     
+    /**
+     * Add an owner to a developper
+     * @param devId id of the dev to add the owner to
+     * @param infos GameDevEditorRelationshipDTO containng the developper id and the editor id
+     * @return
+     */
     @PutMapping("addOwner")
-    public DevelopperDTO addOwner(@RequestParam(name = "devId") final UUID devId, @RequestParam(name = "ownerId") final UUID ownerId) {
+    public DevelopperDTO addOwner(@RequestParam(name = "devId") final UUID devId, @RequestBody @Valid GameDevEditorRelationshipDTO infos) {
+        if(!devId.equals(infos.getDevId())) {
+            throw new GamestoreInvalidParameterException("URL parameter doesn't not match with the request body");
+        }
+        
         Developper devToUpdate = null;
-        boolean isDevExist = devService.developperExistById(devId);
-        boolean isOwnerExist = editorService.editorExistById(ownerId);
+        StringBuilder errorMsg = new StringBuilder();
+        boolean isDevExist = devService.developperExistById(infos.getDevId());
+        boolean isOwnerExist = editorService.editorExistById(infos.getEditorId());
         
         if(isDevExist && isOwnerExist) {
-            Editor editor = editorService.getEditorById(ownerId);
+            Editor editor = editorService.getEditorById(infos.getEditorId());
             devToUpdate = devService.addOwner(devId, editor);
-        } else {
-            throw new GamestoreInvalidParameterException("At least one of the id is invalid");
+        }
+        
+        if(!isDevExist) {
+            String message = String.format("Cannot found a developper with this id: %s", infos.getDevId());
+            errorMsg.append(message);
+            logger.info(message);
+        }
+        if(!isOwnerExist) {
+            String message = String.format("Cannot found an editor with this id: %s", infos.getEditorId());
+            errorMsg.append(message);
+            logger.info(message);
         }
         
         return convertToDTO(devToUpdate);

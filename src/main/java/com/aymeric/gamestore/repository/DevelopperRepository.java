@@ -31,5 +31,10 @@ public interface DevelopperRepository extends CrudRepository<Developper, UUID>, 
      */
     List<Developper> findByName(String name);
     
+    /**
+     * Find all developpers with a name containing the parameter
+     * @param name name/part of name of the games to find
+     * @return a list of developpers
+     */
     List<Developper> findByNameContainingOrderByNameAsc(String name);
 }

@@ -7,6 +7,11 @@ import java.util.UUID;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Games Data Transfert Object
+ * @author Aymeric NEUMANN
+ *
+ */
 public class GameDTO {
     
     private UUID id;

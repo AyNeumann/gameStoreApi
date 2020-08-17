@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +44,7 @@ public class GameService {
      * @param pageNumber number of the required page
      * @return required page
      */
+    @Cacheable(cacheNames = "gameCache")
     public Page<Game> getAllGames(final Integer pageNumber){
         Pageable pageable = PageRequest.of(pageNumber, NUM_OF_USER_PER_PAGE, Sort.by("title"));
         
@@ -113,8 +116,9 @@ public class GameService {
     /**
      * Save the game in the database
      * @param game a valid game
-     * @return the created game or ??
+     * @return the created game or GamestoreEntityException
      */
+    @CacheEvict
     public Game createGame(final Game gameToCreate) {
         Game createdGame = gameRepository.save(gameToCreate);
         
@@ -200,6 +204,7 @@ public class GameService {
      * @param id id of the game to delete
      * @return true is the game is deleted or false otherwise
      */
+    @CacheEvict(key = "#id")
     public boolean deleteGame(final UUID id) {
         boolean isGameDeleted = false;
         boolean isGameExists = gameRepository.existsById(id);

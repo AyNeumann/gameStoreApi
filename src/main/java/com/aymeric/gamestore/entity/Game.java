@@ -1,5 +1,6 @@
 package com.aymeric.gamestore.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -11,8 +12,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.springframework.cache.annotation.Cacheable;
 
 /**
  * @author Aymeric NEUMANN
@@ -20,8 +24,14 @@ import org.hibernate.annotations.Type;
  *
  */
 @Entity
-public class Game {
+@Cacheable
+public class Game implements Serializable {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2193644206718434012L;
+
     /** Id of the game. */
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -36,12 +46,14 @@ public class Game {
     private Date releaseDate;
     
     /** Developed by*/
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
-    private Set<Developper> devs;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<Developper> developper;
     
     /** Edited by*/
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
-    private Set<Editor> editors;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<Editor> editor;
         
     /**
      * @return the title
@@ -75,28 +87,28 @@ public class Game {
      * @return the devs
      */
     public Set<Developper> getDevs() {
-        return devs;
+        return developper;
     }
 
     /**
      * @param devs the devs to set
      */
     public void setDevs(Set<Developper> devs) {
-        this.devs = devs;
+        this.developper = devs;
     }
 
     /**
      * @return the editors
      */
     public Set<Editor> getEditors() {
-        return editors;
+        return editor;
     }
 
     /**
      * @param editors the editors to set
      */
     public void setEditors(Set<Editor> editors) {
-        this.editors = editors;
+        this.editor = editors;
     }
 
     /**
