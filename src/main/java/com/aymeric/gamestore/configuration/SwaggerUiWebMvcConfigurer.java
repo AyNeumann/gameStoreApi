@@ -3,7 +3,7 @@ package com.aymeric.gamestore.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
-import com.aymeric.gamestore.controller.DevelopperController;
+import com.aymeric.gamestore.controller.DeveloperController;
 import com.aymeric.gamestore.controller.EditorController;
 import com.aymeric.gamestore.controller.GameController;
 
@@ -22,7 +22,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @EnableSwagger2
 @ComponentScan(basePackageClasses = {
-        DevelopperController.class,
+        DeveloperController.class,
         EditorController.class,
         GameController.class
 })

@@ -5,7 +5,7 @@ import java.time.ZonedDateTime;
 import org.springframework.http.HttpStatus;
 
 /**
- * Data Transfert Object for basic CRUD infos display.
+ * Data Transfer Object for basic CRUD infos display.
  * Containing:
  * an error message
  * @author Aymeric NEUMANN

@@ -48,7 +48,7 @@ public class Game implements Serializable {
     /** Developed by*/
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<Developper> developper;
+    private Set<Developer> developer;
     
     /** Edited by*/
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
@@ -86,15 +86,15 @@ public class Game implements Serializable {
     /**
      * @return the devs
      */
-    public Set<Developper> getDevs() {
-        return developper;
+    public Set<Developer> getDevs() {
+        return developer;
     }
 
     /**
      * @param devs the devs to set
      */
-    public void setDevs(Set<Developper> devs) {
-        this.developper = devs;
+    public void setDevs(Set<Developer> devs) {
+        this.developer = devs;
     }
 
     /**

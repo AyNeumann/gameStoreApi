@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
- * Editor Data Transfert Object
+ * Editor Data Transfer Object
  * @author Aymeric NEUMANN
  *
  */
@@ -25,7 +25,7 @@ public class EditorDTO {
     private Set<GameDTO> games;
     
     @JsonBackReference(value = "editor-dev")
-    private Set<DevelopperDTO> studios;
+    private Set<DeveloperDTO> studios;
 
     /**
      * @return the name
@@ -58,14 +58,14 @@ public class EditorDTO {
     /**
      * @return the studios
      */
-    public Set<DevelopperDTO> getStudios() {
+    public Set<DeveloperDTO> getStudios() {
         return studios;
     }
 
     /**
      * @param studios the studios to set
      */
-    public void setStudios(Set<DevelopperDTO> studios) {
+    public void setStudios(Set<DeveloperDTO> studios) {
         this.studios = studios;
     }
 

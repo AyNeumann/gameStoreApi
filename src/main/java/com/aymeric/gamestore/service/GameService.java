@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.aymeric.gamestore.entity.Developper;
+import com.aymeric.gamestore.entity.Developer;
 import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.entity.Game;
 import com.aymeric.gamestore.exception.GamestoreEntityException;
@@ -173,11 +173,11 @@ public class GameService {
      * @param dev developper to add to the game
      * @return updated game
      */
-    public Game addDevToGame(final UUID gameId, final Developper dev) {
+    public Game addDevToGame(final UUID gameId, final Developer dev) {
         Game gameToUpdate = getGameById(gameId);
         
         logger.debug("Adding the developper {} to the game {}", dev.getName(), gameToUpdate.getTitle());
-        Set<Developper> devs = gameToUpdate.getDevs();
+        Set<Developer> devs = gameToUpdate.getDevs();
         devs.add(dev);
         
         return createGame(gameToUpdate);

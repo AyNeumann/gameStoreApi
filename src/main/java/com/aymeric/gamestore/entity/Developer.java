@@ -22,19 +22,19 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
  * @author Aymeric NEUMANN
- * Game developpement company
+ * Game development company
  *
  */
 @Entity
 @Cacheable
-public class Developper implements Serializable {
+public class Developer implements Serializable {
     
     /**
      * 
      */
     private static final long serialVersionUID = 7596387642430312739L;
 
-    /** Id of the developper. */
+    /** Id of the developer. */
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
@@ -45,7 +45,7 @@ public class Developper implements Serializable {
     private String name;
     
     /** Have developed */
-    @ManyToMany (mappedBy = "developper", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany (mappedBy = "developer", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JsonBackReference(value = "dev-games")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<Game> games;

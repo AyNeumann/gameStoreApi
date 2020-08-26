@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * Games Data Transfert Object
+ * Games Data Transfer Object
  * @author Aymeric NEUMANN
  *
  */
@@ -23,7 +23,7 @@ public class GameDTO {
     @NotNull
     private Date releaseDate;
     
-    private Set<DevelopperDTO> devs;
+    private Set<DeveloperDTO> devs;
     
     private Set<EditorDTO> editors;
     
@@ -58,14 +58,14 @@ public class GameDTO {
     /**
      * @return the devs
      */
-    public Set<DevelopperDTO> getDevs() {
+    public Set<DeveloperDTO> getDevs() {
         return devs;
     }
 
     /**
      * @param devs the devs to set
      */
-    public void setDevs(Set<DevelopperDTO> devs) {
+    public void setDevs(Set<DeveloperDTO> devs) {
         this.devs = devs;
     }
 

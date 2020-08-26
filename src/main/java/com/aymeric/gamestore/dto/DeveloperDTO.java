@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
- * Developper Data Tranfert Object
+ * Developer Data Tranfer Object
  * @author Aymeric NEUMANN
  *
  */
-public class DevelopperDTO {
+public class DeveloperDTO {
     
     private UUID id;
     

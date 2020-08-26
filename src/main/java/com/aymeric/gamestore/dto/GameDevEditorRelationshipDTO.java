@@ -3,7 +3,7 @@ package com.aymeric.gamestore.dto;
 import java.util.UUID;
 
 /**
- * Games Developpers Editor relationship Data Transfert Object.
+ * Games Developers Editor relationship Data Transfer Object.
  * Why this DTO: @see: https://dzone.com/articles/rest-api-path-vs-request-body-parameters
  * @author Aymeric NEUMANN
  *

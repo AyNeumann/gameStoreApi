@@ -13,38 +13,38 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.aymeric.gamestore.entity.Developper;
+import com.aymeric.gamestore.entity.Developer;
 import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.exception.GamestoreEntityException;
-import com.aymeric.gamestore.repository.DevelopperRepository;
+import com.aymeric.gamestore.repository.DeveloperRepository;
 
 @Service
-public class DevelopperService {
+public class DeveloperService {
     
     /** Logback logger reference. */
-    private static final Logger logger = LoggerFactory.getLogger(DevelopperService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeveloperService.class);
     
     /** Number of user return per page. */
     private static final int NUM_OF_USER_PER_PAGE = 50;
     
     @Autowired
-    DevelopperRepository devRepository;
+    DeveloperRepository devRepository;
     
     /**
-     * Get all developpers by page of 50 result each in title alphabetical order
+     * Get all developers by page of 50 result each in title alphabetical order
      * @param pageNumber number of the required page
      * @return required page
      */
-    public Page<Developper> getAllDeveloppers(final Integer pageNumber) {
+    public Page<Developer> getAllDevelopers(final Integer pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, NUM_OF_USER_PER_PAGE, Sort.by("name"));
          
-        Page<Developper> developpers = devRepository.findAll(pageable);
+        Page<Developer> developers = devRepository.findAll(pageable);
         
-        if(developpers.isEmpty()) {
-            logger.warn("No developpers found on the page number {}", pageNumber);
+        if(developers.isEmpty()) {
+            logger.warn("No developers found on the page number {}", pageNumber);
         }
         
-        return developpers;
+        return developers;
     }
     
     /**
@@ -52,8 +52,8 @@ public class DevelopperService {
      * @param name name of the developement company to find
      * @return a list of matching developement company or an empty list
      */
-    public List<Developper> getDeveloppersByName(final String name, final String searchMode) {
-        List<Developper> developpers = null;
+    public List<Developer> getDeveloppersByName(final String name, final String searchMode) {
+        List<Developer> developpers = null;
         
         if(searchMode != null && searchMode.equals("strict")) {
             logger.debug("Getting developpers by name with strict search");
@@ -75,8 +75,8 @@ public class DevelopperService {
      * @param id id of the developper to get
      * @return the retrieved developper or ??
      */
-    public Developper getDeveloppersById(final UUID id) {
-        Optional<Developper> developperOpt = devRepository.findById(id);
+    public Developer getDeveloppersById(final UUID id) {
+        Optional<Developer> developperOpt = devRepository.findById(id);
         
         if(!developperOpt.isPresent()) {
             String message = String.format("Cannot found a developper with this id: %s", id);
@@ -103,35 +103,18 @@ public class DevelopperService {
         
         return isDevExist;
     }
-    
-    /**
-     * Save the developper in the database
-     * @param developper a valid developper
-     * @return the created developper or ??
-     */
-    public Developper createDevelopper(final Developper developper) {
-        Developper createdDev = devRepository.save(developper);
         
-        if(createdDev.getId() == null) {
-            String message = String.format("The following developper has not been created: %s", developper);
-            logger.error(message);
-            throw new GamestoreEntityException(message);
-        }
-        
-        return createdDev;
-    }
-    
     /**
      * Save a list of validated developpers
      * @param developpers a list of developpers
      * @return the created developpers or ??
      */
-    public List<Developper> createDeveloppers(final List<Developper> developpers) {
+    public List<Developer> createDeveloppers(final List<Developer> developpers) {
         StringBuilder errorMsg = new StringBuilder();
         boolean isADevOnError = false;
-        List<Developper> savedDevs = (List<Developper>) devRepository.saveAll(developpers);
+        List<Developer> savedDevs = (List<Developer>) devRepository.saveAll(developpers);
         
-        for(Developper dev : savedDevs) {
+        for(Developer dev : savedDevs) {
             if(dev.getId() == null) {
                 String message = String.format("The developper named: %s has not been created", dev.getName());
                 errorMsg.append(message);
@@ -152,7 +135,7 @@ public class DevelopperService {
      * @param developper developper to update
      * @return the updated developper
      */
-    public Developper updateDevelopper(final Developper developper) {
+    public Developer updateDevelopper(final Developer developper) {
         return null;
     }
     
@@ -162,8 +145,8 @@ public class DevelopperService {
      * @param owner owner to add to the developper
      * @return updated developper
      */
-    public Developper addOwner(final UUID devId, final Editor owner) {
-        Developper devToUpdate = getDeveloppersById(devId);
+    public Developer addOwner(final UUID devId, final Editor owner) {
+        Developer devToUpdate = getDeveloppersById(devId);
         
         logger.debug("Adding the owner {} to the dev {}", owner.getName(), devToUpdate.getName());
         devToUpdate.setOwner(owner);

@@ -55,7 +55,7 @@ public class Editor implements Serializable {
     @OneToMany(mappedBy="owner")
     @JsonBackReference(value = "editor-dev")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<Developper> developper;
+    private Set<Developer> developper;
 
     /**
      * @return the name
@@ -88,14 +88,14 @@ public class Editor implements Serializable {
     /**
      * @return the studios
      */
-    public Set<Developper> getStudios() {
+    public Set<Developer> getStudios() {
         return developper;
     }
 
     /**
      * @param studios the studios to set
      */
-    public void setStudios(Set<Developper> studios) {
+    public void setStudios(Set<Developer> studios) {
         this.developper = studios;
     }
 

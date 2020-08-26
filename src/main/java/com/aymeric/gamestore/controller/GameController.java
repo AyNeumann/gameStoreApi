@@ -25,11 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aymeric.gamestore.dto.GameDTO;
 import com.aymeric.gamestore.dto.GameDevEditorRelationshipDTO;
-import com.aymeric.gamestore.entity.Developper;
+import com.aymeric.gamestore.entity.Developer;
 import com.aymeric.gamestore.entity.Editor;
 import com.aymeric.gamestore.entity.Game;
 import com.aymeric.gamestore.exception.GamestoreInvalidParameterException;
-import com.aymeric.gamestore.service.DevelopperService;
+import com.aymeric.gamestore.service.DeveloperService;
 import com.aymeric.gamestore.service.EditorService;
 import com.aymeric.gamestore.service.GameService;
 
@@ -54,7 +54,7 @@ public class GameController {
     
     /** Developper service reference. */
     @Autowired
-    private DevelopperService devService;
+    private DeveloperService devService;
     
     /** Editor service reference. */
     @Autowired
@@ -183,7 +183,7 @@ public class GameController {
         boolean isDevExist = devService.developperExistById(infos.getDevId());
                 
         if(isGameExist && isDevExist) {
-            Developper dev = devService.getDeveloppersById(infos.getDevId());
+            Developer dev = devService.getDeveloppersById(infos.getDevId());
             updatedGame = gameService.addDevToGame(infos.getGameId(), dev);
         } 
         
