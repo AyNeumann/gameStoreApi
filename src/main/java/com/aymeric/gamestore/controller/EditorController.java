@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,71 +35,58 @@ public class EditorController {
     private ModelMapper modelMapper;
     
     /**
-     * Get all editors by page
+     * Get all editors by page - TEST OK
      * @param pageNumber number of the required page - 0 based count
      * @return required page
      */
-    @GetMapping("")
-    public Page<EditorDTO> getAllEditors(@RequestParam(name = "pageNumber", required = true) final Integer pageNumber){
+    @GetMapping(value = "/{pageNumber}")
+    public Page<EditorDTO> getAllEditors(@PathVariable("pageNumber") final Integer pageNumber) {
         return convertToDTOPage(editorService.getAllEditors(pageNumber));
     }
     
     /**
-     * Get all editors with a matching name
+     * Get all editors with a matching name - TEST OK
      * @param name name of the editor(s) to find
      * @return a list of matching editors or an empty list
      */
-    @GetMapping("byName")
+    @GetMapping("")
     public List<EditorDTO> getEditorsByName(
             @RequestParam(name = "name") final String name,
-            @RequestParam(name = "searchMode", required = false) final String searchMode
+            @RequestParam(name = "search-mode", required = false) final String searchMode
             ){
         return convertToDTOList(editorService.getEditorsByName(name, searchMode));
     }
     
     /**
-     * Get the editor with the matching id
+     * Get the editor with the matching id - TEST OK
      * @param id id of the editor to get
      * @return the retrieved editor or ??
      */
-    @GetMapping("byId")
-    public EditorDTO getEditorById(@RequestParam(name = "id") final UUID id) {
+    @GetMapping(value = "id/{id}")
+    public EditorDTO getEditorById(@PathVariable("id") final UUID id) {
         return convertToDto(editorService.getEditorById(id));
     }
     
     /**
-     * Save the editor in the database
-     * @param editor a valid editor
-     * @return the created editor or ??
-     */
-    @PostMapping("create")
-    public EditorDTO createEditor(@RequestBody @Valid final EditorDTO editor) {
-        
-        Editor createdEditor = convertToEntity(editor);
-        
-        return convertToDto(editorService.createEditor(createdEditor));
-    }
-    
-    /**
-     * Save the list of valid editors - Test OK
+     * Save the list of valid editors - TEST OK
      * @param editors all editors to create
      * @return the created editors or ??
      */
-    @PostMapping("createAll")
-    public List<EditorDTO> createAll(@RequestBody @Valid final List<EditorDTO> editors) {
+    @PostMapping("")
+    public List<EditorDTO> createEditor(@RequestBody @Valid final List<EditorDTO> editors) {
         
         List<Editor> createdEditors = convertToEntityList(editors);
         
         return convertToDTOList(editorService.createAll(createdEditors));
     }
-    
+        
     /**
      * Update the editor
      * @param editor editor to update
      * @return the updated editor
      */
-    @PutMapping("update")
-    public EditorDTO updateEditor(@RequestBody @Valid final EditorDTO editorDTO) {
+    @PutMapping("/{id}")
+    public EditorDTO updateEditor(@PathVariable("id") final UUID id, @RequestBody @Valid final EditorDTO editorDTO) {
         
         Editor updatedEditor = convertToEntity(editorDTO);
         
@@ -110,8 +98,8 @@ public class EditorController {
      * @param id id of the editor to delete
      * @return true is the editor is deleted or false otherwise
      */
-    @DeleteMapping("delete")
-    public boolean deleteEditor(@RequestParam(name = "id") final UUID id) {
+    @DeleteMapping("")
+    public boolean deleteEditor(@PathVariable("id") final UUID id) {
         return editorService.deleteEditor(id);
     }
     

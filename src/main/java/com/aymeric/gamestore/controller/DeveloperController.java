@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aymeric.gamestore.dto.DeveloperDTO;
@@ -69,10 +70,10 @@ public class DeveloperController {
      * @param name name of the development company to find
      * @return a list of matching development company or an empty list
      */
-    @GetMapping(value = "name/{name}/{searchMode}")
+    @GetMapping("")
     public List<DeveloperDTO> getDevelopersByName(
-            @PathVariable("name") final String name,
-            @PathVariable("searchMode") final String searchMode
+            @RequestParam(name = "name") final String name,
+            @RequestParam(name = "search-mode", required = false) final String searchMode
             ) {
         logger.debug("Getting all developpers named: {}", name);
         return convertToDTOList(devService.getDeveloppersByName(name, searchMode));
@@ -131,7 +132,7 @@ public class DeveloperController {
     }
     
     /**
-     * Add an owner to a developer
+     * Add an owner to a developer - TEST OK
      * @param devId id of the developer to add the owner to
      * @param infos GameDevEditorRelationshipDTO containing the developer id and the editor id
      * @return
